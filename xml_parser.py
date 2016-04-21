@@ -1,15 +1,15 @@
 """
-The Kek XML Parser.
+The XML Parser.
 Use case:
     1.  Place XML in some place - "PATH"
-    2.  python kek.py "PATH"
-    3.  If no "PATH" specified, checks in cwd for kek.xml
+    2.  python xml_parser.py "PATH"
+    3.  If no "PATH" specified, checks in cwd for example.xml
     4.  Optionally, pipe output into a text file to see result:
-            python kek.py "PATH" > kek.txt
+            python kek.py "PATH" > example.txt
 Returns:
     dict {
-        "Field1" : ("Value1", "Value2", ...),
-        "Field2" : ("Value1",),
+        "XML_PATH1" : ("Value1", "Value2", ...),
+        "XML_PATH2" : ("Value1",),
         ...,
     }
 """
@@ -19,7 +19,7 @@ import sys
 import xml.dom.minidom as md
 
 
-def filterkek(child_nodes):
+def filterXML(child_nodes):
     """
     Converts a list of nodes with extraneous garbage:
         In = [
@@ -41,7 +41,7 @@ def filterkek(child_nodes):
     )
 
 
-def flattenkek(elements, path, flat={}):
+def flattenXML(elements, path, flat={}):
     """
     Converts a nested XML:
         In = [
@@ -67,7 +67,7 @@ def flattenkek(elements, path, flat={}):
         }
     """
     # Iterate and recurse.
-    for el in filterkek(elements):
+    for el in filterXML(elements):
       
       # Base case 1: empty nest
       size = el.childNodes.length
@@ -86,22 +86,23 @@ def flattenkek(elements, path, flat={}):
               flat[new_path] += [node.nodeValue]
           continue
       new_path = path + el.tagName + "/"
-      flattenkek(filterkek(el.childNodes), new_path, flat)
+      flattenXML(filterXML(el.childNodes), new_path, flat)
     return flat
 
 
-def parsekek():
+def parseXML():
     # Saves "PATH" to XML file.
     if len(sys.argv) > 1:
         xml_path = sys.argv[1]
     else:
-        xml_path = "kek.xml"
+        #REPLACE "example.xml" with XML that you want parsed
+        xml_path = "example.xml"
 
     # Reads in the XML document.
-    kek_xml = md.parse(xml_path)
+    test_xml = md.parse(xml_path)
 
     # Dictionary of Data Fields.
-    kektionary = dict()
+    XML_dictionary = dict()
 
     # """
     # If this exists, overwrites later student-submitted scores.
@@ -111,20 +112,18 @@ def parsekek():
     #         </OfficialTestScores>
     #     </UCPerson>
     # """
-    # for ots in kek_xml.getElementsByTagName('OfficialTestScores'):
-    #     data = filterkek(ots.childNodes)
-    #     kektionary.update(flattenkek(data))
+    # for ots in test_xml.getElementsByTagName('OfficialTestScores'):
+    #     data = filterXML(ots.childNodes)
+    #     XML_dictionary.update(flattenXML(data))
 
     """
     Change this depending on which nodes need to be defined beyond its parent.
-        kektionary["Parent of Parent"] = flattenkek(...)
+        XML_dictionary["Parent of Parent"] = flattenkek(...)
     """
-    kektionary.update(flattenkek(kek_xml.getElementsByTagName("UCRecords"), ""))
+    XML_dictionary.update(flattenXML(test_xml.getElementsByTagName("UCRecords"), ""))
     
-    return kektionary
+    return XML_dictionary
 
-kektionary = parsekek()
-pprint(kektionary)
+XML_dictionary = parseXML()
+pprint(XML_dictionary)
 
-# TODO: Insert specific mappings between data. In what form does PDF parser 
-#       expect the data? 
