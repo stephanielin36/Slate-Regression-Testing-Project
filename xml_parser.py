@@ -1,5 +1,8 @@
 """
 The XML Parser.
+@author: koshy1
+Last date edited:  April 21, 2016
+
 Use case:
     1.  Place XML in some place - "PATH"
     2.  python xml_parser.py "PATH"
